@@ -11,7 +11,7 @@ class Car {
         this.year = year;
         this.mileage = mileage;
         this.fuelType = fuelType;
-        this.priceToEngineSizeRatio = (Number(price) / Number(engineSize) * 1000).toFixed(2);
+        this.priceToEngineSizeRatio = parseFloat((Number(price) / Number(engineSize) * 1000).toFixed(2));
     }
     show() {
         console.log('\nName: ', this.name);
