@@ -15,3 +15,6 @@ Retrieves information about cars, including:
 - price to engine capacity ratio
 
 Results are sorted by ratio, most expensive per liter first.
+
+If you want to retrieve a huge number of pages, I recommend
+to increase node default memory limit `node --max-old-space-size=8192 app.js <howManyPages>`.

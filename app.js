@@ -11,7 +11,7 @@ class Car {
         this.year = year;
         this.mileage = mileage;
         this.fuelType = fuelType;
-        this.priceToEngineSizeRatio = Number(price) / Number(engineSize) * 1000;
+        this.priceToEngineSizeRatio = (Number(price) / Number(engineSize) * 1000).toFixed(2);
     }
     show() {
         console.log('\nName: ', this.name);
@@ -35,7 +35,7 @@ function getPageData(page) {
                 name = list[i].querySelector('.offer-title a').getAttribute('title');
 
                 price = list[i].querySelector('.offer-price__number');
-                if (price) price = price.textContent.replace(/ /g, '').replace('PLN', '').replace('EUR', '').replace('\n', '');
+                if (price) price = price.textContent.replace(/ /g, '').replace('PLN', '').replace('EUR', '').replace('\n', '').replace(',', '.');
 
                 engineSize = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="engine_capacity"] span');
                 if (engineSize) engineSize = engineSize.textContent.replace('cm3', '').replace(' ', '');
@@ -66,14 +66,6 @@ function getPages(pages) {
 
 async function getDataParallel(pages, showResults = true) {
     await getPages(pages);
-    results.sort((a, b) => (a.priceToEngineSizeRatio < b.priceToEngineSizeRatio) ? 1 : ((a.priceToEngineSizeRatio > b.priceToEngineSizeRatio) ? -1 : 0));
-    if (showResults) results.forEach(obj => obj.show());
-    writeResultsToCSV();
-}
-
-async function getDataSequential(pages, showResults = true) {
-    for (var page = 1; page <= pages; page++)
-        await getPageData(page);
     results.sort((a, b) => (a.priceToEngineSizeRatio < b.priceToEngineSizeRatio) ? 1 : ((a.priceToEngineSizeRatio > b.priceToEngineSizeRatio) ? -1 : 0));
     if (showResults) results.forEach(obj => obj.show());
     writeResultsToCSV();
