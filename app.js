@@ -2,7 +2,6 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const rp = require('request-promise');
 const fs = require('fs');
-var results = new Array();
 
 class Car {
     constructor(name, price, engineSize, year, mileage, fuelType) {
@@ -95,4 +94,7 @@ function writeResultsToCSV() {
     });
 }
 
-getDataParallel(10, false);
+var results = new Array();
+var pagesArg = process.argv.slice(2)[0] ? process.argv.slice(2)[0] : 10;
+
+getDataParallel(pagesArg, false);
