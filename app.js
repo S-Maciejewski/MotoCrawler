@@ -12,7 +12,7 @@ class Car {
         this.year = year;
         this.mileage = mileage;
         this.fuelType = fuelType;
-        this.ratio = Number(price) / Number(engineSize) * 1000;
+        this.priceToEngineSizeRatio = Number(price) / Number(engineSize) * 1000;
     }
     show() {
         console.log('\nName: ', this.name);
@@ -21,7 +21,7 @@ class Car {
         console.log('Fuel type: ', this.fuelType);
         console.log('Price: ', this.price);
         console.log('Engine size: ', this.engineSize);
-        console.log('Price per liter of engine capacity: ', this.ratio);
+        console.log('Price per liter of engine capacity: ', this.priceToEngineSizeRatio);
     }
 }
 
@@ -67,7 +67,7 @@ function getPages(pages) {
 
 async function getDataParallel(pages, showResults = true) {
     await getPages(pages);
-    results.sort((a, b) => (a.ratio < b.ratio) ? 1 : ((a.ratio > b.ratio) ? -1 : 0));
+    results.sort((a, b) => (a.priceToEngineSizeRatio < b.priceToEngineSizeRatio) ? 1 : ((a.priceToEngineSizeRatio > b.priceToEngineSizeRatio) ? -1 : 0));
     if (showResults) results.forEach(obj => obj.show());
     writeResultsToCSV();
 }
@@ -75,7 +75,7 @@ async function getDataParallel(pages, showResults = true) {
 async function getDataSequential(pages, showResults = true) {
     for (var page = 1; page <= pages; page++)
         await getPageData(page);
-    results.sort((a, b) => (a.ratio < b.ratio) ? 1 : ((a.ratio > b.ratio) ? -1 : 0));
+    results.sort((a, b) => (a.priceToEngineSizeRatio < b.priceToEngineSizeRatio) ? 1 : ((a.priceToEngineSizeRatio > b.priceToEngineSizeRatio) ? -1 : 0));
     if (showResults) results.forEach(obj => obj.show());
     writeResultsToCSV();
 }
