@@ -4,7 +4,7 @@ const rp = require('request-promise');
 const fs = require('fs');
 
 class Car {
-    constructor(name, price, engineSize, year, mileage, fuelType) {
+    constructor(name, price, engineSize, year, mileage, fuelType, link) {
         this.name = name;
         this.price = price;
         this.engineSize = engineSize;
@@ -12,6 +12,7 @@ class Car {
         this.mileage = mileage;
         this.fuelType = fuelType;
         this.priceToEngineSizeRatio = parseFloat((Number(price) / Number(engineSize) * 1000).toFixed(2));
+        this.link = link;
     }
     show() {
         console.log('\nName: ', this.name);
@@ -38,19 +39,21 @@ function getPageData(page) {
                 if (price) price = price.textContent.replace(/ /g, '').replace('PLN', '').replace('EUR', '').replace('\n', '').replace(',', '.');
 
                 engineSize = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="engine_capacity"] span');
-                if (engineSize) engineSize = engineSize.textContent.replace('cm3', '').replace(' ', '');
+                if (engineSize) engineSize = engineSize.textContent.replace('cm3', '').replace(/ /g, '');
 
                 year = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="year"] span');
-                if (year) year = year.textContent;
+                if (year) year = year.textContent.replace(/ /g, '');
 
                 mileage = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="mileage"] span');
-                if (mileage) mileage = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="mileage"] span').textContent;
+                if (mileage) mileage = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="mileage"] span').textContent.replace('km', '').replace(/ /g, '');
 
                 fuelType = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="fuel_type"] span');
                 if (fuelType) fuelType = fuelType.textContent;
 
-                if (name && price && engineSize && mileage && fuelType)
-                    results.push(new Car(name, price, engineSize, year, mileage, fuelType));
+                link = list[i].getAttribute('data-href').replace('https://www.', '');
+
+                if (name && price && engineSize && mileage && fuelType && link)
+                    results.push(new Car(name, price, engineSize, year, mileage, fuelType, link));
             }
     }).catch(err => {
         console.log('Error occured while getting data, details: ', err);

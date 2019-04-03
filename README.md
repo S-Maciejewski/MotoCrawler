@@ -13,6 +13,7 @@ Retrieves information about cars, including:
 - mileage in km
 - fuel type
 - price to engine capacity ratio
+- URL link to otomoto.pl for this car
 
 Results are sorted by ratio, most expensive per liter first.
 
