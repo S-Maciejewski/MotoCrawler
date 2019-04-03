@@ -2,7 +2,7 @@
 Node.js application for screen scraping data about cars listed for sale at otomoto.pl.
 
 To run this script, be sure to have **node** and **npm** installed.
-To install the necessary libraries run `npm install`,
+To install the necessary libraries run `npm install request-promise` and `npm install jsdom`,
 then run script with `node app.js <howManyPages>`.
 
 Retrieves information about cars, including:
