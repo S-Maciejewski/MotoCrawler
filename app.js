@@ -6,12 +6,12 @@ const fs = require('fs');
 class Car {
     constructor(name, price, engineSize, year, mileage, fuelType, link) {
         this.name = name;
-        this.price = price;
-        this.engineSize = engineSize;
+        this.price = Math.round(Number(price));
+        this.engineSize = Math.round(Number(engineSize));
         this.year = year;
-        this.mileage = mileage;
+        this.mileage = Math.round(Number(mileage));
         this.fuelType = fuelType;
-        this.priceToEngineSizeRatio = parseFloat((Number(price) / Number(engineSize) * 1000).toFixed(2));
+        this.priceToEngineSizeRatio = Math.round((Number(price) / Number(engineSize) * 1000));
         this.link = link;
     }
     show() {
