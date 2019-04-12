@@ -25,6 +25,34 @@ class Car {
     }
 }
 
+function isReal(car) { //TODO sanity-check validation
+    return true;
+}
+
+function getParsedCarData(name, price, engineSize, year, mileage, fuelType, link) {
+    if (!price.textContent.includes('EUR'))
+        price = price.textContent.replace(/ /g, '').replace('PLN', '').replace('\n', '').replace(',', '.');
+    else
+        price = Number(price.textContent.replace(/ /g, '').replace('EUR', '').replace('\n', '').replace(',', '.')) * euroPrice;
+
+    if (!isElectric(fuelType))
+        engineSize = engineSize.textContent.replace('cm3', '').replace(/ /g, '');
+    else
+        engineSize = 1;
+    year = year.textContent.replace(/ /g, '');
+    mileage = mileage.textContent.replace('km', '').replace(/ /g, '');
+    fuelType = fuelType.textContent;
+
+    let car = new Car(name, price, engineSize, year, mileage, fuelType, link);
+    if (isReal(car))
+        return car;
+    return null;
+}
+
+function isElectric(fuelType) {
+    return fuelType.textContent == 'Elektryczny';
+}
+
 function getPageData(page) {
     return rp('https://www.otomoto.pl/osobowe/?search_new_used=&page=' + page).then(body => {
         console.log('Getting data from https://www.otomoto.pl/osobowe/?search_new_used=&page=' + page)
@@ -34,26 +62,18 @@ function getPageData(page) {
         if (list)
             for (var i = 0; i < list.length; i++) {
                 name = list[i].querySelector('.offer-title a').getAttribute('title');
-
                 price = list[i].querySelector('.offer-price__number');
-                if (price) price = price.textContent.replace(/ /g, '').replace('PLN', '').replace('EUR', '').replace('\n', '').replace(',', '.');
-
                 engineSize = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="engine_capacity"] span');
-                if (engineSize) engineSize = engineSize.textContent.replace('cm3', '').replace(/ /g, '');
-
                 year = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="year"] span');
-                if (year) year = year.textContent.replace(/ /g, '');
-
                 mileage = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="mileage"] span');
-                if (mileage) mileage = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="mileage"] span').textContent.replace('km', '').replace(/ /g, '');
-
                 fuelType = list[i].querySelector('.offer-item__content .offer-item__params li[data-code="fuel_type"] span');
-                if (fuelType) fuelType = fuelType.textContent;
-
                 link = list[i].getAttribute('data-href').replace('https://www.', '');
 
-                if (name && price && engineSize && mileage && fuelType && link)
-                    results.push(new Car(name, price, engineSize, year, mileage, fuelType, link));
+                if (name && price && (engineSize || (fuelType && isElectric(fuelType))) && mileage && fuelType && link) {
+                    let car = getParsedCarData(name, price, engineSize, year, mileage, fuelType, link);
+                    if (car)
+                        results.push(getParsedCarData(name, price, engineSize, year, mileage, fuelType, link));
+                }
             }
     }).catch(err => {
         console.log('Error occured while getting data, details: ', err);
@@ -67,7 +87,7 @@ function getPages(pages) {
     return Promise.all(promises);
 }
 
-async function getDataParallel(pages, showResults = true) {
+async function getDataParallel(pages, showResults = false) {
     await getPages(pages);
     results.sort((a, b) => (a.priceToEngineSizeRatio < b.priceToEngineSizeRatio) ? 1 : ((a.priceToEngineSizeRatio > b.priceToEngineSizeRatio) ? -1 : 0));
     if (showResults) results.forEach(obj => obj.show());
@@ -89,7 +109,9 @@ function writeResultsToCSV() {
     });
 }
 
+// https://www.google.com/search?q=eur+to+pln
+var euroPrice = 4; //TODO Get real value
 var results = new Array();
 var pagesArg = process.argv.slice(2)[0] ? process.argv.slice(2)[0] : 10;
 
-getDataParallel(pagesArg, false);
+getDataParallel(pagesArg);
