@@ -25,8 +25,8 @@ class Car {
     }
 }
 
-function isReal(car) { //TODO sanity-check validation
-    return true;
+function isReal(car) {
+    return !((car.year == currentYear || car.year == currentYear - 1) && car.price < 20000) && car.mileage < 1000000 && car.price < 20000000;
 }
 
 function getParsedCarData(name, price, engineSize, year, mileage, fuelType, link) {
@@ -46,6 +46,7 @@ function getParsedCarData(name, price, engineSize, year, mileage, fuelType, link
     let car = new Car(name, price, engineSize, year, mileage, fuelType, link);
     if (isReal(car))
         return car;
+    console.log('Filtered out an unrealistic offer:', link);
     return null;
 }
 
@@ -87,7 +88,17 @@ function getPages(pages) {
     return Promise.all(promises);
 }
 
+function getEuroPriceData() {
+    return rp('https://stooq.pl/q/?s=eurpln').then(body => {
+        console.log('Getting data from https://stooq.pl/q/?s=eurpln');
+        let price = Number(new JSDOM(body).window.document.getElementById('aq_eurpln_c5').textContent.replace(/ /g, ''));
+        console.log('Euro price:', price);
+        euroPrice = price ? price : 4;
+    });
+}
+
 async function getDataParallel(pages, showResults = false) {
+    await getEuroPriceData();
     await getPages(pages);
     results.sort((a, b) => (a.priceToEngineSizeRatio < b.priceToEngineSizeRatio) ? 1 : ((a.priceToEngineSizeRatio > b.priceToEngineSizeRatio) ? -1 : 0));
     if (showResults) results.forEach(obj => obj.show());
@@ -109,8 +120,8 @@ function writeResultsToCSV() {
     });
 }
 
-// https://www.google.com/search?q=eur+to+pln
-var euroPrice = 4; //TODO Get real value
+var euroPrice = 4;
+var currentYear = new Date().getFullYear();
 var results = new Array();
 var pagesArg = process.argv.slice(2)[0] ? process.argv.slice(2)[0] : 10;
 
